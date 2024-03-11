@@ -6,10 +6,10 @@ namespace SlotMachine
     {
         static void Main(string[] args)
         {
-            const int NDX_0 = 0, GAME_1 = 1, NDX_1 = 1, GAME_2 = 2, NDX_2 = 2, GAME_3 = 3, ROW_COLUMN_LENGTH = 3;
-            const double HALF_BONUS = 0.50;
+            const int NDX_0 = 0, GAME_1 = 1, NDX_1 = 1, NDX_2 = 2, GAME_3 = 3, ROW_COLUMN_LENGTH = 3, NUM_CHECKS_2 = 2, NUM_CHECKS_3 = 3, NUM_CHECKS_5 = 5, NUM_CHECKS_6 = 6;
+            const decimal HALF_BONUS = 0.50M;
             const string WIN = "WIN!", LOST = "LOST!";
-            double playerMoney = 20.00;
+            decimal playerMoney = 20.00M;
             Random rng = new Random();
             ConsoleKeyInfo userInput;
             
@@ -18,10 +18,10 @@ namespace SlotMachine
             while (true)
             {
                 // Get Random Numbers for Slot Machine
-                int[,] slotMachine = { { 0, 1, 2 }, { 2, 0, 1 }, { 1 , 2, 0 } };
-                for (int i = 0; i < ROW_COLUMN_LENGTH; i++) 
+                int[,] slotMachine = new int[3,3];
+                for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
                 {
-                    for (int j = 0; j < ROW_COLUMN_LENGTH; j++) 
+                    for (int j = 0; j < ROW_COLUMN_LENGTH; j++)
                     {
                         slotMachine[i, j] = rng.Next(3);
                     }
@@ -47,38 +47,28 @@ namespace SlotMachine
                 // Take Player Wager
                 Console.WriteLine($"\nPlayer money: {playerMoney:F2}");
                 Console.Write($"How much is your wager (cannot exceed amount of player money): ");
-                double userInputWager = double.Parse(Console.ReadLine());
+                decimal userInputWager = decimal.Parse(Console.ReadLine());
 
                 // Repeat Player Wager if wager is out of bound.
                 while (userInputWager < 0 || userInputWager > playerMoney)
-                { 
+                {
                     Console.WriteLine($"\nPlayer money: {playerMoney:F2}");
                     Console.Write($"How much is your wager (cannot exceed amount of player money): ");
-                    userInputWager = double.Parse(Console.ReadLine());
+                    userInputWager = decimal.Parse(Console.ReadLine());
                 }
 
-                // Set Money Amounts
+                // Set Amounts
                 playerMoney -= userInputWager;
-                double potentialWinAmount = HALF_BONUS * (userInputWager) + 1;
-                int numOfChecks = 1;
-
-                if (userInputNumLines == GAME_2)
-                {
-                    potentialWinAmount = HALF_BONUS * userInputWager + userInputWager / 3;
-                    numOfChecks = 3;
-                }
-
-                if (userInputNumLines == GAME_3)
-                {
-                    potentialWinAmount = HALF_BONUS * userInputWager + userInputWager / 5;
-                    numOfChecks = 8;
-                }
+                decimal potentialWinAmount = HALF_BONUS * (userInputWager) + 1;
+                int numChecks = (userInputNumLines == GAME_3) ? 8 : 3;
+                potentialWinAmount += (userInputNumLines == GAME_3) ? (userInputWager / 5) - 1: (userInputWager / 3) - 1;
+                Console.WriteLine($"Potential Win Amount per line: {potentialWinAmount:F2}"); // DELETE CODE
 
                 // Print Slot Machine Roll
                 Console.WriteLine("\nSlot Machine Roll");
-                for (int i =  0; i < ROW_COLUMN_LENGTH; i++) 
-                { 
-                    for (int j = 0; j < ROW_COLUMN_LENGTH; j++) 
+                for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
+                {
+                    for (int j = 0; j < ROW_COLUMN_LENGTH; j++)
                     {
                         Console.Write($"{slotMachine[i, j]}  ");
                         if (j == NDX_2)
@@ -89,102 +79,92 @@ namespace SlotMachine
                 }
 
                 // Assign variables for calculations
-                double winAmount = 0;
-                int[] row_col_diag = {0, 0, 0};
-                int counter = 0;
+                decimal winAmount = 0;
+                int[] row_col_diag = { 0, 0, 0 };
+                int ndxCounter = 0;
 
-                // Check all lines
-                while (counter < numOfChecks) 
-                {  
+                // Check Lines
+                while (ndxCounter < numChecks) {
+
                     bool Win = false;
 
-                    for (int i = 0; i < ROW_COLUMN_LENGTH; i++) 
+                    // Check Horizontal Lines
+                    if (ndxCounter < NUM_CHECKS_3)
                     {
-                        // Center horizontal line
-                        if (counter == NDX_0)
+                        for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
                         {
-                            row_col_diag[i] = slotMachine[NDX_1, i];
-                        }
-
-                        // Top horizontal line
-                        if (counter == NDX_1)
-                        {
-                            row_col_diag[i] = slotMachine[NDX_0, i];
-                        }
-
-                        // Bottom horizontal line
-                        if (counter == NDX_2)
-                        {
-                            row_col_diag[i] = slotMachine[NDX_2, i];
-                        }
-
-                        // Left vertical line
-                        if (counter == NDX_2 + NDX_1)
-                        {
-                            row_col_diag[i] = slotMachine[i, NDX_0];
-                        }
-
-                        // Center vertical line
-                        if (counter == NDX_2 * NDX_2)
-                        {
-                            row_col_diag[i] = slotMachine[i, NDX_1];
-                        }
-
-                        // Right vertical line
-                        if (counter == NDX_2 * NDX_2 + NDX_1)
-                        {
-                            row_col_diag[i] = slotMachine[i, NDX_2];
-                        }
-
-                        // Top left to bottom right diagonal line
-                        if (counter == NDX_2 * NDX_2 + NDX_2)
-                        {
-                            row_col_diag[i] = slotMachine[i, i];
-                        }
-                        
-                        // Bottom left to top right diagonal line
-                        if (counter == NDX_2 * NDX_2 * NDX_2 - NDX_1)
-                        {
-                            int j = 0;
-                            if (i == NDX_0)
+                            // ERROR - Rework    
+                            if (userInputNumLines == GAME_1 && ndxCounter != NDX_1) 
                             {
-                                j = NDX_2; 
+                                continue;
                             }
 
-                            if (i == NDX_1) 
-                            {
-                                j = NDX_1;
-                            }
-
-                            if (i == NDX_2)
-                            {
-                                j = NDX_0;
-                            }
-
-                            row_col_diag[i] = slotMachine[i, j];
-                        } 
+                            row_col_diag[i] = slotMachine[ndxCounter, i];
+                        }
                     }
 
-                    // (Array.TrueForAll(row, ele => ele.Equals(row[0])) {}
-                    if (row_col_diag[NDX_0] == row_col_diag[NDX_1] && row_col_diag[NDX_1] == row_col_diag[NDX_2])
+                    // Check Vertical Lines
+                    if (ndxCounter > NUM_CHECKS_2 && ndxCounter < NUM_CHECKS_6) 
                     {
-                        winAmount += potentialWinAmount;
-                        Win = true;
+                        for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
+                        {
+                            row_col_diag[i] = slotMachine[i, ndxCounter - 3];
+                        }
+                    }
+                   
+
+                    // Check Diagonal Lines
+                    if (ndxCounter > NUM_CHECKS_5)
+                    {
+                        for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
+                        {
+                            if (ndxCounter == 6)
+                            {
+                                row_col_diag[i] = slotMachine[i, i];
+                            }
+                            
+                            if (ndxCounter == 7)
+                            {
+                                for (int j = 2; j >= 0; j--)
+                                {
+                                    row_col_diag[i] = slotMachine[i, j];
+                                }
+                            }
+                        }
+                    }
+
+                    // Determine if row is a win.
+                    int rowChecker = 0;
+                    if (!(userInputNumLines == GAME_1 && ndxCounter != NDX_1))
+                    {
+                        for (int i = 1; i < ROW_COLUMN_LENGTH; i++)
+                        {
+                            if (row_col_diag[NDX_0] == row_col_diag[i])
+                            {
+                                rowChecker++;
+                            }
+                        }
+
+                        if (rowChecker == 2)
+                        {
+                            winAmount += potentialWinAmount;
+                            Win = true;
+                        }
                     }
 
                     // DELETE IN FINAL CODE
-                    if (counter == 0)
+                    if (ndxCounter == 0)
                     {
                         Console.Write("\n");
                     }
-                    Console.Write($"Row {counter + NDX_1}: ");
+                    Console.Write($"Row {ndxCounter + NDX_1}: ");
                     foreach (int i in row_col_diag)
                     {
                         Console.Write($"{i} ");
                     }
-                    Console.Write($"{Win}");
+                    Console.Write($"({Win}), Row Checker: {rowChecker}");
                     Console.Write("\n");
-                    counter++;           
+                    ndxCounter++;
                 }
 
                 // Determine if Player won or lost
@@ -196,7 +176,7 @@ namespace SlotMachine
                 playerMoney += winAmount;
 
                 // Print out Game Results Status
-                Console.WriteLine($"\n{game_results}");
+                Console.WriteLine($"\nPlayer {game_results}");
                 Console.WriteLine($"Won: ${winAmount:F2}");
                 Console.WriteLine($"Remaining: ${playerMoney:F2}\n");
 
@@ -213,7 +193,7 @@ namespace SlotMachine
                 if (playerMoney == 0) 
                 {
                     Console.WriteLine("\nPlayer has lost all money. Refreshing game...\n");
-                    playerMoney = 20.00;
+                    playerMoney = 20.00M;
                 }
             }
         }
