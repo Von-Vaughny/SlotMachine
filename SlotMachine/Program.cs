@@ -18,10 +18,14 @@ namespace SlotMachine
             while (true)
             {
                 // Get Random Numbers for Slot Machine
-                int A0 = rng.Next(3), A1 = rng.Next(3), A2 = rng.Next(3); // First slot line
-                int B0 = rng.Next(3), B1 = rng.Next(3), B2 = rng.Next(3); // Second slot line
-                int C0 = rng.Next(3), C1 = rng.Next(3), C2 = rng.Next(3); // Third slot line
-                int[,] slotMachine = { { A0, A1, A2 }, { B0, B1, B2 }, { C0, C1, C2 } };
+                int[,] slotMachine = { { 0, 1, 2 }, { 2, 0, 1 }, { 1 , 2, 0 } };
+                for (int i = 0; i < ROW_COLUMN_LENGTH; i++) 
+                {
+                    for (int j = 0; j < ROW_COLUMN_LENGTH; j++) 
+                    {
+                        slotMachine[i, j] = rng.Next(3);
+                    }
+                }
 
                 // Print Select Gameplay Menu
                 Console.WriteLine("\nSelect gameplay: ");
