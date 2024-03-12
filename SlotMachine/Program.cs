@@ -76,7 +76,6 @@ namespace SlotMachine
                     {
                         userInputWager = amount;
                     }
-
                 }
                 
                 // Set Amounts
@@ -115,7 +114,6 @@ namespace SlotMachine
                 decimal winAmount = 0;
                 int[] row_col_diag = { 0, 0, 0 };
 
-
                 // Check Lines
                 while (ndxCounter < numChecks) {
 
@@ -125,8 +123,7 @@ namespace SlotMachine
                     if (ndxCounter < NUM_CHECKS_3)
                     {
                         for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
-                        {
-                            // ERROR - Rework    
+                        { 
                             if (userInputGameSelection == GAME_1 && ndxCounter != NDX_1) 
                             {
                                 continue;
@@ -144,11 +141,11 @@ namespace SlotMachine
                             row_col_diag[i] = slotMachine[i, ndxCounter - NDX_3];
                         }
                     }
-                   
 
                     // Check Diagonal Lines
                     if (ndxCounter > NUM_CHECKS_5)
                     {
+                        int j = NDX_2;
                         for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
                         {
                             if (ndxCounter == NUM_CHECKS_6)
@@ -158,10 +155,8 @@ namespace SlotMachine
                             
                             if (ndxCounter == NUM_CHECKS_7)
                             {
-                                for (int j = NDX_2; j >= 0; j--)
-                                {
-                                    row_col_diag[i] = slotMachine[i, j];
-                                }
+                                row_col_diag[i] = slotMachine[i, j];
+                                j--;
                             }
                         }
                     }
