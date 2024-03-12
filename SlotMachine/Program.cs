@@ -32,9 +32,9 @@ namespace SlotMachine
                 Console.WriteLine("\nSelect gameplay: ");
                 Console.WriteLine("1. Center line");
                 Console.WriteLine("2. All horizontal lines");
-                Console.WriteLine("3. All vertical lines\n");
-                //Console.WriteLine("4. All diagonal lines");
-                //Console.WriteLine("5. All lines (horizontal, vertical, and diagonal)\n");
+                Console.WriteLine("3. All vertical lines");
+                Console.WriteLine("4. All diagonal lines");
+                Console.WriteLine("5. All lines (horizontal, vertical, and diagonal)\n");
 
                 int number;
                 int userInputGameSelection = 0;
@@ -47,7 +47,7 @@ namespace SlotMachine
                 }
 
                 // Repeat Player Game Selection if selection is out of bound.
-                while (userInputGameSelection < GAME_1 || userInputGameSelection > GAME_3)
+                while (userInputGameSelection < GAME_1 || userInputGameSelection > GAME_5)
                 {
                     Console.Write("Play Game ");
                     if (int.TryParse(Console.ReadLine(), out number))
@@ -78,12 +78,23 @@ namespace SlotMachine
                     }
 
                 }
-
+                
                 // Set Amounts
                 playerMoney -= userInputWager;
-                decimal potentialWinAmount = HALF_BONUS * (userInputWager) + A_DOLLAR;
-                int numChecks = (userInputGameSelection == GAME_3) ? NUM_CHECKS_8 : NUM_CHECKS_3;
-                potentialWinAmount += (userInputGameSelection == GAME_3) ? (userInputWager / NUM_CHECKS_5) - A_DOLLAR: (userInputWager / NUM_CHECKS_3) - A_DOLLAR;
+                int ndxCounter = 0;
+                decimal potentialWinAmount = (userInputGameSelection == GAME_1 ? (userInputWager + A_DOLLAR) : ((HALF_BONUS * userInputWager) + A_DOLLAR));
+                int numChecks = (userInputGameSelection == GAME_5 ? NUM_CHECKS_8 : NUM_CHECKS_3);
+                if (userInputGameSelection == GAME_3) 
+                {
+                    numChecks = NUM_CHECKS_6;
+                    ndxCounter = NUM_CHECKS_3;
+                }
+                if (userInputGameSelection == GAME_4) 
+                {
+                    numChecks = NUM_CHECKS_8;
+                    ndxCounter = NUM_CHECKS_6;
+
+                }
                 Console.WriteLine($"Potential Win Amount per line: {potentialWinAmount:F2}"); // DELETE CODE
 
                 // Print Slot Machine Roll
@@ -103,7 +114,6 @@ namespace SlotMachine
                 // Assign variables for calculations
                 decimal winAmount = 0;
                 int[] row_col_diag = { 0, 0, 0 };
-                int ndxCounter = 0;
 
 
                 // Check Lines
