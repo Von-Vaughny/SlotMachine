@@ -6,9 +6,9 @@ namespace SlotMachine
     {
         static void Main(string[] args)
         {
-            const int ROW_COLUMN_LENGTH = 3, NDX_0 = 0,  NDX_1 = 1, NDX_2 = 2, NDX_3 = 3, GAME_1 = 1, GAME_2 = 2, GAME_3 = 3, GAME_4 = 4, GAME_5 = 5;
-            const int A_DOLLAR = 1, NUM_CHECKS_2 = 2, NUM_CHECKS_3 = 3, NUM_CHECKS_5 = 5, NUM_CHECKS_6 = 6, NUM_CHECKS_7 = 7, NUM_CHECKS_8 = 8;
-            const decimal A_CENT = 0.01M, HALF_BONUS = 0.50M, PLAYER_MONEY_RESET = 20.00M;
+            const int LINE_2 = 1, LINE_3 = 2, LINE_6 = 5, GAME_1 = 1, GAME_3 = 3, GAME_4 = 4, GAME_5 = 5;
+            const int LINE_LENGTH = 3, MAX_VALUE = 3, NUM_LINE_CHECKS_2 = 2, NUM_LINE_CHECKS_3 = 3;
+            const decimal A_CENT = 0.01M, HALF_BONUS = 0.50M, A_DOLLAR = 1.00M, PLAYER_MONEY_RESET = 20.00M;
             const string WIN = "WIN!", LOST = "LOST!";
             decimal playerMoney = 20.00M;
             Random rng = new Random();
@@ -18,13 +18,13 @@ namespace SlotMachine
 
             while (true)
             {
-                // Get Random Numbers for Slot Machine
-                int[,] slotMachine = new int[NDX_3,NDX_3];
-                for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
+                // Get Random Numbers for Slot Machine ./
+                int[,] slotMachine = new int[LINE_LENGTH, LINE_LENGTH];
+                for (int i = 0; i < LINE_LENGTH; i++)
                 {
-                    for (int j = 0; j < ROW_COLUMN_LENGTH; j++)
+                    for (int j = 0; j < LINE_LENGTH; j++)
                     {
-                        slotMachine[i, j] = rng.Next(NDX_3);
+                        slotMachine[i, j] = rng.Next(MAX_VALUE); //
                     }
                 }
 
@@ -36,35 +36,38 @@ namespace SlotMachine
                 Console.WriteLine("4. All diagonal lines");
                 Console.WriteLine("5. All lines (horizontal, vertical, and diagonal)\n");
 
-                int number;
+                // Set Selection
+                int userNumber;
                 int userInputGameSelection = 0;
 
                 // Take Player Game Selection
                 Console.Write("Play Game ");
-                if (int.TryParse(Console.ReadLine(), out number))
+                if (int.TryParse(Console.ReadLine(), out userNumber))
                 {
-                    userInputGameSelection = number;
+                    userInputGameSelection = userNumber;
                 }
 
                 // Repeat Player Game Selection if selection is out of bound.
                 while (userInputGameSelection < GAME_1 || userInputGameSelection > GAME_5)
                 {
                     Console.Write("Play Game ");
-                    if (int.TryParse(Console.ReadLine(), out number))
+                    if (int.TryParse(Console.ReadLine(), out userNumber))
                     {
-                        userInputGameSelection = number;
+                        userInputGameSelection = userNumber;
                     }
                 }
 
-                decimal amount;
+                // Set Amounts
+                decimal userAmount;
                 decimal userInputWager = 0;
+
                 // Take Player Wager
                 Console.WriteLine($"\nPlayer money: {playerMoney:F2}");
                 Console.Write($"How much is your wager (cannot exceed amount of player money): ");
-                
-                if (decimal.TryParse(Console.ReadLine(), out amount)) 
+
+                if (decimal.TryParse(Console.ReadLine(), out userAmount))
                 {
-                    userInputWager = amount;
+                    userInputWager = userAmount;
                 }
 
                 // Repeat Player Wager if wager is out of bound.
@@ -72,108 +75,109 @@ namespace SlotMachine
                 {
                     Console.WriteLine($"\nPlayer money: {playerMoney:F2}");
                     Console.Write($"How much is your wager (cannot exceed amount of player money): ");
-                    if (decimal.TryParse(Console.ReadLine(), out amount))
+                    if (decimal.TryParse(Console.ReadLine(), out userAmount))
                     {
-                        userInputWager = amount;
+                        userInputWager = userAmount;
                     }
                 }
-                
-                // Set Amounts
-                playerMoney -= userInputWager;
-                int ndxCounter = 0;
-                decimal potentialWinAmount = (userInputGameSelection == GAME_1 ? (userInputWager + A_DOLLAR) : ((HALF_BONUS * userInputWager) + A_DOLLAR));
-                int numChecks = (userInputGameSelection == GAME_5 ? NUM_CHECKS_8 : NUM_CHECKS_3);
-                if (userInputGameSelection == GAME_3) 
-                {
-                    numChecks = NUM_CHECKS_6;
-                    ndxCounter = NUM_CHECKS_3;
-                }
-                if (userInputGameSelection == GAME_4) 
-                {
-                    numChecks = NUM_CHECKS_8;
-                    ndxCounter = NUM_CHECKS_6;
-
-                }
-                Console.WriteLine($"Potential Win Amount per line: {potentialWinAmount:F2}"); // DELETE CODE
 
                 // Print Slot Machine Roll
                 Console.WriteLine("\nSlot Machine Roll");
-                for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
+                for (int i = 0; i < LINE_LENGTH; i++)
                 {
-                    for (int j = 0; j < ROW_COLUMN_LENGTH; j++)
+                    for (int j = 0; j < LINE_LENGTH; j++)
                     {
                         Console.Write($"{slotMachine[i, j]}  ");
-                        if (j == NDX_2)
+                        if (j == LINE_LENGTH - 1) 
                         {
                             Console.Write("\n");
                         }
                     }
                 }
 
-                // Assign variables for calculations
+                // Set Amuounts and Variables for calculations
+                playerMoney -= userInputWager;
+                decimal potentialWinAmount = (userInputGameSelection == GAME_1 ? (userInputWager + A_DOLLAR) : ((HALF_BONUS * userInputWager) + A_DOLLAR));
                 decimal winAmount = 0;
-                int[] row_col_diag = { 0, 0, 0 };
+                int[] aSingleLine = { 0, 1, 2 };
 
-                // Check Lines
-                while (ndxCounter < numChecks) {
+                // Determine where line starts and how many lines should be checked based on game selection
+                int lineNumber = (userInputGameSelection == GAME_4 ? NUM_LINE_CHECKS_3 + NUM_LINE_CHECKS_3 : 0);
+                int numLineChecks = (userInputGameSelection >= GAME_4 ? NUM_LINE_CHECKS_3 + NUM_LINE_CHECKS_3 + NUM_LINE_CHECKS_2 : 3);
+                if (userInputGameSelection == GAME_3) 
+                {
+                    lineNumber = NUM_LINE_CHECKS_3;
+                    numLineChecks = NUM_LINE_CHECKS_3 + NUM_LINE_CHECKS_3;
+                }
 
-                    bool Win = false;
+                // DELETE IN FINAL CODE
+                Console.WriteLine($"\nPotential Win Amount per line: {potentialWinAmount:F2}");
 
-                    // Check Horizontal Lines
-                    if (ndxCounter < NUM_CHECKS_3)
+                // Check specific lines based on user inputted game selection
+                while (lineNumber < numLineChecks) 
+                {
+
+                    // HORIZONTAL LINES - Obtain first three lines for games 1, 2, or 5, skip if game is 3 or 4
+                    if (lineNumber <= LINE_3) 
                     {
-                        for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
-                        { 
-                            if (userInputGameSelection == GAME_1 && ndxCounter != NDX_1) 
-                            {
-                                continue;
-                            }
-
-                            row_col_diag[i] = slotMachine[ndxCounter, i];
+                        // Check Horizontal Lines
+                        for (int i = 0; i < LINE_LENGTH; i++)
+                        {
+                            aSingleLine[i] = slotMachine[lineNumber,i];
                         }
                     }
 
-                    // Check Vertical Lines
-                    if (ndxCounter > NUM_CHECKS_2 && ndxCounter < NUM_CHECKS_6) 
-                    {
-                        for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
+                    // VERTICAL LINES - Obtain second three lines for game 3 or 5, skip if game is 1, 2, or 4
+                    if (lineNumber > LINE_3 && lineNumber <= LINE_6) 
+                    { 
+                        //Check Vertical Lines
+                        for (int i = 0; i < LINE_LENGTH; i++) 
                         {
-                            row_col_diag[i] = slotMachine[i, ndxCounter - NDX_3];
+                            // lineNumber % NUM_LINE_CHECKS_3 ensures lineNumber is within line index of slot machine
+                            aSingleLine[i] = slotMachine[i, lineNumber % NUM_LINE_CHECKS_3];
                         }
                     }
 
-                    // Check Diagonal Lines
-                    if (ndxCounter > NUM_CHECKS_5)
+                    // Check Diagonal Lines - Skip if user inputted game selection is 1, 2, or 3
+                    if (lineNumber > LINE_6) 
                     {
-                        int j = NDX_2;
-                        for (int i = 0; i < ROW_COLUMN_LENGTH; i++)
+                        int j = LINE_3; 
+
+                        for (int i = 0; i < LINE_LENGTH; i++)
                         {
-                            if (ndxCounter == NUM_CHECKS_6)
+                            // lineNumber % (NUM_LINE_CHECKS_3 + NUM_LINE_CHECKS_2) ensures modifiedLineNumber is within line index of slot machine
+                            int modifiedLineNumber = lineNumber % (NUM_LINE_CHECKS_3 + NUM_LINE_CHECKS_3);
+
+                            // Modified line number 0
+                            if (modifiedLineNumber != LINE_2)
                             {
-                                row_col_diag[i] = slotMachine[i, i];
+                                aSingleLine[i] = slotMachine[i, i];
                             }
-                            
-                            if (ndxCounter == NUM_CHECKS_7)
+
+                            // Modified Line number 1
+                            if (modifiedLineNumber == LINE_2)
                             {
-                                row_col_diag[i] = slotMachine[i, j];
+                                aSingleLine[i] = slotMachine[i, j];
                                 j--;
                             }
                         }
                     }
 
-                    // Determine if row is a win. //
-                    int rowChecker = 0;
-                    if (!(userInputGameSelection == GAME_1 && ndxCounter != NDX_1))
+                    // Set values for determining if a single line is a winner
+                    int lineChecker = 0;
+                    bool Win = false;
+
+                    // Determine if the line has the same three numbers
+                    if (!(userInputGameSelection == GAME_1 && lineNumber != LINE_2))
                     {
-                        for (int i = NDX_1; i < ROW_COLUMN_LENGTH; i++)
+                        for (int i = 0; i < LINE_LENGTH; i++)//
                         {
-                            if (row_col_diag[NDX_0] == row_col_diag[i])
+                            if (aSingleLine[0] == aSingleLine[i])
                             {
-                                rowChecker++;
+                                lineChecker++;
                             }
                         }
-
-                        if (rowChecker == NUM_CHECKS_2)
+                        if (lineChecker == LINE_LENGTH)
                         {
                             winAmount += potentialWinAmount;
                             Win = true;
@@ -181,18 +185,25 @@ namespace SlotMachine
                     }
 
                     // DELETE IN FINAL CODE
-                    if (ndxCounter == 0)
+                    string counted = "";
+                    if (userInputGameSelection == GAME_1 && lineNumber!= LINE_2)
+                    {
+                        counted = "(Not Tallied)";
+                    }   
+                    if (lineNumber == 0)
                     {
                         Console.Write("\n");
                     }
-                    Console.Write($"Row {ndxCounter + NDX_1}: ");
-                    foreach (int i in row_col_diag)
+                    Console.Write($"Line {lineNumber + 1}: ");
+                    foreach (int i in aSingleLine)
                     {
                         Console.Write($"{i} ");
                     }
-                    Console.Write($"({Win}), Row Checker: {rowChecker}");
+                    Console.Write($"({Win}), Line Checker: {lineChecker} {counted}");
                     Console.Write("\n");
-                    ndxCounter++;
+
+                    // Increment LineNumber
+                    lineNumber++;
                 }
 
                 // Determine if Player won or lost
