@@ -110,9 +110,6 @@ namespace SlotMachine
                     numLineChecks = NUM_LINE_CHECKS_3 + NUM_LINE_CHECKS_3;
                 }
 
-                // DELETE IN FINAL CODE
-                Console.WriteLine($"\nPotential Win Amount per line: {potentialWinAmount:F2}");
-
                 // Check specific lines based on user inputted game selection
                 while (lineNumber < numLineChecks) 
                 {
@@ -165,7 +162,6 @@ namespace SlotMachine
 
                     // Set values for determining if a single line is a winner
                     int lineChecker = 0;
-                    bool Win = false;
 
                     // Determine if the line has the same three numbers
                     if (!(userInputGameSelection == GAME_1 && lineNumber != LINE_2))
@@ -180,27 +176,8 @@ namespace SlotMachine
                         if (lineChecker == LINE_LENGTH)
                         {
                             winAmount += potentialWinAmount;
-                            Win = true;
                         }
                     }
-
-                    // DELETE IN FINAL CODE
-                    string counted = "";
-                    if (userInputGameSelection == GAME_1 && lineNumber!= LINE_2)
-                    {
-                        counted = "(Not Tallied)";
-                    }   
-                    if (lineNumber == 0)
-                    {
-                        Console.Write("\n");
-                    }
-                    Console.Write($"Line {lineNumber + 1}: ");
-                    foreach (int i in aSingleLine)
-                    {
-                        Console.Write($"{i} ");
-                    }
-                    Console.Write($"({Win}), Line Checker: {lineChecker} {counted}");
-                    Console.Write("\n");
 
                     // Increment LineNumber
                     lineNumber++;
