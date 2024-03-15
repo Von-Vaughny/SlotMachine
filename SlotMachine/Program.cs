@@ -18,6 +18,7 @@ namespace SlotMachine
 
             while (true)
             {
+
                 // Get Random Numbers for Slot Machine ./
                 int[,] slotMachine = new int[LINE_LENGTH, LINE_LENGTH];
                 for (int i = 0; i < LINE_LENGTH; i++)
